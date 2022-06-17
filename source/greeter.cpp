@@ -1,5 +1,5 @@
 #include <fmt/format.h>
-#include <greeter/greeter.h>
+#include <frisbeetracker/greeter.h>
 
 using namespace greeter;
 

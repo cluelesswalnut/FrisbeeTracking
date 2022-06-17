@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
-#include <greeter/greeter.h>
-#include <greeter/version.h>
+#include <frisbeetracker/greeter.h>
+#include <frisbeetracker/version.h>
 
 #include <string>
 
@@ -16,6 +16,6 @@ TEST_CASE("Greeter") {
 }
 
 TEST_CASE("Greeter version") {
-  static_assert(std::string_view(GREETER_VERSION) == std::string_view("1.0"));
-  CHECK(std::string(GREETER_VERSION) == std::string("1.0"));
+  static_assert(std::string_view(FRISBEETRACKER_VERSION) == std::string_view("1.0"));
+  CHECK(std::string(FRISBEETRACKER_VERSION) == std::string("1.0"));
 }
