@@ -15,8 +15,10 @@ int main()
     // OpenCvTutorial::test(vid);
 
     std::vector<cv::Mat> video = OpenCvTutorial::readVideo(vid);
-    video = TrackFrisbee::thresholdFrisbeeHsv(video);
-    video = TrackFrisbee::frisbeeContour(video);
+    std::vector<cv::Mat> videoEdit = TrackFrisbee::thresholdFrisbeeHsv(video);
 
-    OpenCvTutorial::showVideo(video);
+    std::vector<TrackFrisbee::FrameContours> contours = TrackFrisbee::findFrisbeeContours(videoEdit);
+    videoEdit = TrackFrisbee::showContours(video, contours);
+
+    OpenCvTutorial::showVideo(videoEdit);
 }

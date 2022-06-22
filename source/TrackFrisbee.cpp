@@ -24,13 +24,18 @@ namespace TrackFrisbee
         return frisbeeThreshold;
     }
 
-    std::vector<cv::Mat> frisbeeContour(const std::vector<cv::Mat>& video)
+    std::vector<FrameContours> findFrisbeeContours(const std::vector<cv::Mat>& video)
     {
-        std::vector<cv::Mat> frisbeeThreshold;
+        // verify each image is the correct format
+        for (const auto& i : video)
+            assert(i.type() == CV_8U);
+
+        std::vector<FrameContours> finalContours;
         for (const auto& frame : video)
         {
             // output values for `findContours`
-            std::vector<std::vector<cv::Point> > contours;
+            FrameContours contours;
+            FrameContours frisbeeContours;
             std::vector<cv::Vec4i> hierarchy;
             // initialize an image to draw the contours on
             cv::Mat imgWithContours = cv::Mat::zeros( frame.size(), CV_8U );
@@ -40,12 +45,44 @@ namespace TrackFrisbee
 
             for( size_t i = 0; i< contours.size(); i++ )
             {
-                cv::Scalar color = cv::Scalar(255);
-                cv::drawContours( imgWithContours, contours, (int)i, color, 2, cv::LINE_8, hierarchy, 0 );
+                // `approxPoly` is very impactful. It facilitates checking concavity and affects
+                // the contour area
+                std::vector<cv::Point> poly;
+                cv::approxPolyDP(contours[i], contours[i], 0.5, true);
+
+                // verify the object is approximately frisbee sized
+                double area = cv::contourArea(contours[i]);
+                if (area > FRISBEE_MAX_AREA || area < FRISBEE_MIN_AREA)
+                    continue;
+
+                // verify the object is convex. This eliminates many random shapes
+                // such as people
+                if (!cv::isContourConvex(contours[i]))
+                    continue;
+
+                frisbeeContours.push_back(contours[i]);
             }
-            frisbeeThreshold.push_back(imgWithContours);
+            finalContours.push_back(frisbeeContours);
         }
-        return frisbeeThreshold;
+        return finalContours;
     }
 
+    std::vector<cv::Mat> showContours(const std::vector<cv::Mat>& video, const std::vector<FrameContours>& contours)
+    {
+        assert(video.size() == contours.size());
+        
+        std::vector<cv::Mat> outVideo;
+        for (size_t frameIndex = 0; frameIndex < video.size(); ++frameIndex)
+        {
+            cv::Mat imgWithContours = video[frameIndex].clone();
+            FrameContours currFrameContours = contours[frameIndex];
+            for( size_t i = 0; i< currFrameContours.size(); i++ )
+            {
+                cv::Scalar color = cv::Scalar(0, 0, 255);
+                cv::drawContours( imgWithContours, currFrameContours, (int)i, color, -1, cv::LINE_8, cv::noArray(), 0 );
+            }
+            outVideo.push_back(imgWithContours);
+        }
+        return outVideo;
+    }
 }

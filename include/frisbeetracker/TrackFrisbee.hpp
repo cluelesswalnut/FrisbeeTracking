@@ -7,25 +7,21 @@
 
 namespace TrackFrisbee
 {
-        // frisbee HSV bounds found by experimenting
-        const int FRIS_LOW_H = 0;
-        const int FRIS_HIGH_H = 179;
+    // frisbee size found by experimenting
+    const int FRISBEE_MAX_AREA = 100;
+    const int FRISBEE_MIN_AREA = 25;
 
-        const int FRIS_LOW_S = 0; 
-        const int FRIS_HIGH_S = 255;
+    // frisbee HSV bounds found by experimenting
+    const int FRIS_LOW_H = 0;
+    const int FRIS_HIGH_H = 179;
 
-        const int FRIS_LOW_V = 175;
-        const int FRIS_HIGH_V = 255;
+    const int FRIS_LOW_S = 0; 
+    const int FRIS_HIGH_S = 255;
 
-        // grass HSV bounds found by experimenting
-        // int iLowH = 33;
-        // int iHighH = 75;
+    const int FRIS_LOW_V = 175;
+    const int FRIS_HIGH_V = 255;
 
-        // int iLowS = 0; 
-        // int iHighS = 255;
-
-        // int iLowV = 0;
-        // int iHighV = 255;
+    typedef std::vector<std::vector<cv::Point>> FrameContours;
 
     /**
      * @brief Creates a new set of frames with white pixels anywhere the input video
@@ -37,10 +33,22 @@ namespace TrackFrisbee
     std::vector<cv::Mat> thresholdFrisbeeHsv(const std::vector<cv::Mat>& video);
 
     /**
-     * @brief WIP
+     * @brief Find contours that could be a frisbee based on approximating the
+     * polygon, size, and concavity
      * 
-     * @param video 
-     * @return std::vector<cv::Mat> 
+     * @param video the video to find the contours in. Video needs to be consist of
+     * CV_U8 frames.
+     * @return std::vector<FrameContours> containing each of the potential frisbee contours
      */
-    std::vector<cv::Mat> frisbeeContour(const std::vector<cv::Mat>& video);
+    std::vector<FrameContours> findFrisbeeContours(const std::vector<cv::Mat>& video);
+
+    /**
+     * @brief Draws contours on the frames of an existing video
+     * 
+     * @param video the video the draw on
+     * @param contours the contours to draw. One `FrameContours` is required per frame in 
+     * @p video
+     * @return std::vector<cv::Mat> the resulting video
+     */
+    std::vector<cv::Mat> showContours(const std::vector<cv::Mat>& video, const std::vector<FrameContours>& contours);
 }
